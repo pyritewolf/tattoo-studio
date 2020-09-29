@@ -12,8 +12,8 @@
 	main {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		justify-content: stretch;
+		align-items: stretch;
+		justify-content: center;
 		padding: 1em;
 		margin: 0 auto;
 		width: 60%;

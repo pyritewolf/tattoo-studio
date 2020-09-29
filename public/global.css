@@ -10,6 +10,7 @@ html {
 
 :root {
 	--gap-md: 2rem;
+	--gap-sm: 1rem;
 	--dark-font: #222;
 	--lighter-gray: #f2efeb;
 	--light-gray: #c9c6c1;
@@ -18,7 +19,7 @@ html {
 	--blue: #073B5B;
 	--font-md: 1.5rem;
 	--font-lg: 2rem;
-	--radius: 0.5rem;
+	--radius: 0.3rem;
 }
 
 body {
