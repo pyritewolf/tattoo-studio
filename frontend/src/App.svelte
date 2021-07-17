@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Message from './components/Message.svelte';
 	import Calculation from './components/Calculation.svelte';
 </script>
