@@ -16,7 +16,7 @@ COPY ./backend/ /app/
 RUN poetry config virtualenvs.create false && poetry install --no-dev
 
 RUN rm -rf /app/static/*
-COPY --from=frontend /app/public/ /app/static/
+COPY --from=frontend /app/public/static/ /app/static/
 COPY --from=frontend /app/public/index.html /app/templates/
 
 ENV APP_MODULE="main:app"
