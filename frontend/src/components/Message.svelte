@@ -20,20 +20,38 @@
   };
 
   $: parsedValue = parseMessage(value);
+  
+  const fallbackCopyTextToClipboard = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Avoid scrolling to bottom
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+  
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  }
 
   const copy = async () => {
-    await navigator.clipboard.writeText(parsedValue)
+    if (!navigator.clipboard)
+      fallbackCopyTextToClipboard(parsedValue);
+    else
+      navigator.clipboard.writeText(parsedValue);
     copyButtonText = "Copiado! ✨"
-    setTimeout(() => {
-      copyButtonText  = "Copiar";
-    }, 3000);
-  };
+    setTimeout(() => copyButtonText  = "Copiar", 3000)
+  }
+
 </script>
 <div>
   <textarea bind:value={value}/>
   <div class="row">
     <h2>Vista previa</h2>
-    <button on:click={copy}>{copyButtonText}</button>
+    <button type="button" on:click={copy}>{copyButtonText}</button>
   </div>
   <p>{parsedValue}</p>
 </div>
@@ -68,5 +86,6 @@
     border-radius: var(--radius);
     height: 4rem;
     text-transform: uppercase;
+    cursor: pointer;
   }
 </style>
