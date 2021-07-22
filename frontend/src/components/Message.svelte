@@ -4,22 +4,21 @@
 
   let value = `Un tattoo con esas características estaría {{mercadopago}} si abonás con MercadoPago (permite pagar en cuotas, te recomiendo consultar en https://www.mercadopago.com.ar/ayuda/medios-de-pago-cuotas-promociones_264 qué promociones o recargos aplican para tu tarjeta y tu banco); o en efectivo / transferencia se aplicaría un descuento y quedaría en {{efectivo}}`;
   const mapping = {
-    '{{mercadopago}}': $calculations && parseCoin($calculations.cash * $calculations.digitalPaymentModifier),
-    '{{efectivo}}': $calculations && parseCoin($calculations.cash),
+    '{{mercadopago}}': (val) => val && parseCoin(val.cash * val.digitalPaymentModifier),
+    '{{efectivo}}': (val) => val && parseCoin(val.cash),
   };
   let copyButtonText = "Copiar";
+  let parsedValue;
 
-
-  const parseMessage = string => {
-    let str = string;
+  const parseMessage = (str, calc) => {
     Object.keys(mapping).forEach(keyword => {
       const regex = new RegExp(keyword, 'g');
-      str = str.replace(regex, mapping[keyword]);
+      str = str.replace(regex, mapping[keyword](calc));
     })
-    return str;
+    parsedValue = str;
   };
 
-  $: parsedValue = parseMessage(value);
+  $: parseMessage(value, {...$calculations});
   
   const fallbackCopyTextToClipboard = (text) => {
     const textArea = document.createElement("textarea");
@@ -45,7 +44,6 @@
     copyButtonText = "Copiado! ✨"
     setTimeout(() => copyButtonText  = "Copiar", 3000)
   }
-
 </script>
 <div>
   <textarea bind:value={value}/>
