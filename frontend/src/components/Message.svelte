@@ -1,14 +1,15 @@
 <script>
-  import { calculations } from '../store.js';
+  import { calculations, message } from '../store.js';
   import { parseCoin } from '../utils.js';
 
-  let value = `Un tattoo con esas características estaría {{mercadopago}} si abonás con MercadoPago (permite pagar en cuotas, te recomiendo consultar en https://www.mercadopago.com.ar/ayuda/medios-de-pago-cuotas-promociones_264 qué promociones o recargos aplican para tu tarjeta y tu banco); o en efectivo / transferencia se aplicaría un descuento y quedaría en {{efectivo}}`;
   const mapping = {
     '{{mercadopago}}': (val) => val && parseCoin(val.cash * val.digitalPaymentModifier),
     '{{efectivo}}': (val) => val && parseCoin(val.cash),
   };
   let copyButtonText = "Copiar";
   let parsedValue;
+  const initialStauts = "Tu mensaje va a guardarse automáticamente mientras escribís.";
+  let status = initialStauts;
 
   const parseMessage = (str, calc) => {
     Object.keys(mapping).forEach(keyword => {
@@ -18,7 +19,7 @@
     parsedValue = str;
   };
 
-  $: parseMessage(value, {...$calculations});
+  $: parseMessage($message, {...$calculations});
   
   const fallbackCopyTextToClipboard = (text) => {
     const textArea = document.createElement("textarea");
@@ -44,9 +45,27 @@
     copyButtonText = "Copiado! ✨"
     setTimeout(() => copyButtonText  = "Copiar", 3000)
   }
+
+  let throttling;
+  let changingMessage;
+  const throttledSave = (e) => {
+    if (throttling) clearTimeout(throttling);
+    console.log(e)
+    throttling = setTimeout(() => {
+      status = "Guardando..."
+      message.update(() => {
+        localStorage.setItem("message", e.target.value);
+        return e.target.value;
+      });
+      status = "Guardado!"
+      if (changingMessage) clearTimeout(changingMessage);
+      changingMessage = setTimeout(() => status = initialStauts, 2000);
+    }, 250)
+  }
 </script>
 <div>
-  <textarea bind:value={value}/>
+  <p class="status">{status}</p>
+  <textarea bind:value={$message} on:input={throttledSave}/>
   <div class="row">
     <h2>Vista previa</h2>
     <button type="button" on:click={copy}>{copyButtonText}</button>
@@ -54,6 +73,10 @@
   <p>{parsedValue}</p>
 </div>
 <style>
+  .status {
+    font-size: var(--font-sm);
+  }
+  
   textarea {
     width: 100%;
     padding: var(--gap-md);
